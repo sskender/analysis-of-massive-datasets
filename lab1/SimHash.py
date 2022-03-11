@@ -5,18 +5,15 @@ import hashlib
 input_data = sys.stdin.read().strip().split("\n")
 
 def simhash(text):
-    sh = list()
-    tokens = text.split(" ")
+    sh = [0 for i in range(128)]
+    tokens = text.strip().split(" ")
     for token in tokens:
         hashed = hashlib.md5(token.encode())
         result = hashed.hexdigest()
         bits = bin(int(result, 16))[2:]  # remove 0b prefix
         bits = bits.rjust(128, "0")  # fix padding
         for i in range(len(bits)):
-            if i >= len(sh):
-                sh.append(0)
-            bit = bits[i]
-            if bit == "1":
+            if bits[i] == "1":
                 sh[i] += 1
             else:
                 sh[i] -= 1
@@ -25,7 +22,8 @@ def simhash(text):
             sh[i] = 1
         else:
             sh[i] = 0
-    return hex(int("".join(map(str, sh)), 2))[2:]  # remove 0x prefix
+    hex_result = hex(int("".join(map(str, sh)), 2))[2:]  # remove 0x prefix
+    return hex_result.rjust(32, "0")  # fix padding
 
 # validate simhash function
 test_in = "fakultet elektrotehnike i racunarstva"
