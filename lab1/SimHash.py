@@ -9,12 +9,12 @@ def simhash(document):
         result = hashed.hexdigest()
         bits = bin(int(result, 16))[2:]  # remove 0b prefix
         bits = bits.rjust(128, "0")  # fix padding
-        for i in range(len(bits)):
-            if bits[i] == "1":
+        for i, bit in enumerate(bits):
+            if bit == "1":
                 sh[i] += 1
             else:
                 sh[i] -= 1
-    for i in range(len(sh)):
+    for i in range(128):
         if sh[i] >= 0:
             sh[i] = 1
         else:
@@ -23,9 +23,9 @@ def simhash(document):
     return hex_result.rjust(32, "0")  # fix padding
 
 # validate simhash function
-test_in = "fakultet elektrotehnike i racunarstva"
-test_out = "f27c6b49c8fcec47ebeef2de783eaf57"
-assert(simhash(test_in) == test_out)
+# test_in = "fakultet elektrotehnike i racunarstva"
+# test_out = "f27c6b49c8fcec47ebeef2de783eaf57"
+# assert simhash(test_in) == test_out
 
 # read data from stdin
 input_data = sys.stdin.read().strip().split("\n")
@@ -33,18 +33,15 @@ input_data = sys.stdin.read().strip().split("\n")
 # input text
 N = int(input_data[0])
 document_list = input_data[1:N+1]
-assert(len(document_list) == N)
 
 # input queries
 Q = int(input_data[N+1])
 query_list = input_data[N+2:]
-assert(len(query_list) == Q)
 
 # translate input text to simhashes
 document_hash_list = list()
 for document in document_list:
     document_hash_list.append(simhash(document))
-assert(len(document_hash_list) == N)
 
 def hamming_distance_threshold(hash1, hash2, K):
     # convert hex 1 to bits
@@ -62,8 +59,7 @@ def hamming_distance_threshold(hash1, hash2, K):
                 return False
     if hamming_distance > K:
         return False
-    else:
-        return True
+    return True
 
 for query in query_list:
     I = int(query.split(" ")[0])
