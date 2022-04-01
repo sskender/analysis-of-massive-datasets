@@ -47,7 +47,7 @@ def main():
     threshold = math.floor(N * s)
     baskets_list = []
     for _, basket in enumerate(baskets_input):
-        baskets_list.append([int(article) for article in basket.split()])
+        baskets_list.append([int(item) for item in basket.split()])
 
     # pcy algo
     items_dict, _, pairs_dict = pcy(N, b, threshold, baskets_list)
