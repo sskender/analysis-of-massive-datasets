@@ -4,8 +4,7 @@ import sys
 N = 0
 beta = 0
 max_iteration = 0
-outgoing_nodes = []
-ingoing_nodes = []
+nodes = []
 iter_node_ranks_matrix = {}
 
 
@@ -14,15 +13,13 @@ def calc_rank(r_iteration, r_node_idx):
     global max_iteration
 
     for iteration_i in range(max_iteration + 1, r_iteration + 1):
+        previous_iteration = iteration_i - 1
         for node_idx in range(N):
-            sum_ri_di = 0
-            previous_iteration = iteration_i - 1
-            for ingoing_node_idx in ingoing_nodes[node_idx]:
-                ri = iter_node_ranks_matrix[(previous_iteration, ingoing_node_idx)]
-                di = len(outgoing_nodes[ingoing_node_idx])
-                sum_ri_di += ri / di
-            rj = beta * sum_ri_di + (1 - beta) / N
-            iter_node_ranks_matrix[(iteration_i, node_idx)] = rj
+            iter_node_ranks_matrix[(iteration_i, node_idx)] = (1 - beta) / N
+        for node_idx in range(N):
+            ri = (iter_node_ranks_matrix[(previous_iteration, node_idx)] / len(nodes[node_idx])) * beta
+            for edge_idx in nodes[node_idx]:
+                iter_node_ranks_matrix[(iteration_i, edge_idx)] += ri
 
     if r_iteration > max_iteration:
         max_iteration = r_iteration
@@ -39,14 +36,9 @@ def main():
     beta = float(beta_str)
 
     # load nodes and edges
-    for _ in range(N):
-        ingoing_nodes.append([])
     for node_idx in range(N):
-        edges_list = list(map(int, sys.stdin.readline().split()))
-        outgoing_nodes.append(edges_list)
-        for edge_idx in edges_list:
-            if node_idx not in ingoing_nodes[edge_idx]:
-                ingoing_nodes[edge_idx].append(node_idx)
+        edges_list = list(map(int, sys.stdin.readline().strip().split()))
+        nodes.append(edges_list)
 
     # calculate iteration 0
     iteration_0 = 0
@@ -56,7 +48,7 @@ def main():
     # execute queries
     Q = int(sys.stdin.readline())
     for _ in range(Q):
-        node_idx, iteration = list(map(int, sys.stdin.readline().split()))
+        node_idx, iteration = list(map(int, sys.stdin.readline().strip().split()))
         rank = calc_rank(iteration, node_idx)
         print("%.10f" % rank)
 
